@@ -41,7 +41,14 @@ const userSchema = new mongoose_1.Schema({
         unique: true,
         minlength: 3
     },
-    passwordHash: String
+    passwordHash: String,
+    cart: [{
+            productId: String,
+            title: String,
+            price: Number,
+            images: [String],
+            quantity: Number
+        }]
 });
 userSchema.set('toJSON', {
     transform: (document, returnedObject) => {
@@ -52,4 +59,4 @@ userSchema.set('toJSON', {
     }
 });
 const User = mongoose_1.default.model('User', userSchema);
-module.exports = User;
+exports.default = User;

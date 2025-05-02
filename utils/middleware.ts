@@ -1,13 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
-const jwt = require('jsonwebtoken')
+import jwt, { JwtPayload } from 'jsonwebtoken'
 
-const logger = require('./logger')
-const User = require('../models/user')
-
-interface TokenRequest extends Request {
-  token: string | null ,
-  user?: string
-}
+import logger from './logger'
+import User from '../models/user'
+import { TokenRequest } from '../types/TokenRequest'
 
 const requestLogger = (req: Request, res: Response, next: NextFunction) => {
   logger.info('Method:', req.method)
@@ -25,15 +21,15 @@ const errorHandler = (error: Error, req: Request, res: Response, next: NextFunct
   logger.error(error.message, ',', error.name)
 
   if (error.name === 'CastError') {
-    return res.status(400).send({ error: 'malformatted id' })
+    res.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
-    return res.status(400).json({ error: error.message })
+    res.status(400).json({ error: error.message })
   } else if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
-    return res.status(400).json({ error: 'expected `username` to be unique' })
+    res.status(400).json({ error: 'expected `username` to be unique' })
   } else if (error.name ===  'JsonWebTokenError') {
-    return res.status(401).json({ error: 'token missing or invalid' })
+    res.status(401).json({ error: 'token missing or invalid' })
   } else if (error.name === 'TokenExpiredError') {
-    return res.status(401).json({ error: 'token expired' })
+    res.status(401).json({ error: 'token expired' })
   }
   next(error)
 }
@@ -51,25 +47,28 @@ const tokenExtractor = (req: TokenRequest, res: Response, next: NextFunction) =>
 const userExtractor = async (req: TokenRequest, res: Response, next: NextFunction) => {
   const token = req.token
   if (!token) {
-    return res.status(401).json({error: 'token missing'})
+    res.status(401).json({error: 'token missing'})
+    return
   }
-  const decodedToken = jwt.verify(req.token, process.env.SECRET)
+  const decodedToken: JwtPayload = jwt.verify(token, process.env.SECRET!) as JwtPayload
   if (!decodedToken.id) {
-    return res.status(401).json({error: 'token invalid'})
+    res.status(401).json({error: 'token invalid'})
+    return
   }
   const user = await User.findById(decodedToken.id)
   
   if (!user) {
-    return res.status(404).json({error: 'cannot find user in database'})
-   }
-   req.user = user
+    res.status(404).json({error: 'cannot find user in database'})
+    return
+  }
+  req.user = user
   next()
 }
 
-module.exports = {
+export {
   requestLogger,
   unknownEndpoint,
   errorHandler,
   tokenExtractor,
-  userExtractor
+  userExtractor,
 }

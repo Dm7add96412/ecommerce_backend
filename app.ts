@@ -1,18 +1,20 @@
 import express from 'express'
-import mongoose from 'mongoose'
-import { Error } from 'mongoose'
+import mongoose, { Error } from 'mongoose'
+import cors from 'cors'
 
-const config = require('./utils/config')
+import { MONGODB_URI } from './utils/config'
+import usersRouter from './controllers/users'
+import { requestLogger, tokenExtractor, unknownEndpoint, errorHandler } from './utils/middleware'
+import loginRouter from './controllers/login'
+import logger from './utils/logger'
+
 const app = express()
-const cors = require('cors')
-const usersRouter = require('./controllers/users')
-const middleware = require('./utils/middleware')
-const loginRouter = require('./controllers/login')
-const logger = require('./utils/logger')
+
+const mongodbUri = MONGODB_URI as string
 
 mongoose.set('strictQuery', false)
-logger.info('connecting to', config.MONGODB_URI)
-mongoose.connect(config.MONGODB_URI)
+logger.info('connecting to', mongodbUri)
+mongoose.connect(mongodbUri)
     .then(() => {
         logger.info('connected to MongoDB')
     })
@@ -23,13 +25,13 @@ mongoose.connect(config.MONGODB_URI)
 app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
-app.use(middleware.requestLogger)
-app.use(middleware.tokenExtractor)
+app.use(requestLogger)
+app.use(tokenExtractor)
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
-app.use(middleware.unknownEndpoint)
-app.use(middleware.errorHandler)
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
-module.exports = app
+export default app

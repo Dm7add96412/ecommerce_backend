@@ -1,9 +1,18 @@
 import mongoose, { AnyObject, Document, Schema, Types } from 'mongoose'
 
-interface IUser extends Document {
+interface ICartItem {
+    productId: string,
+    title: string,
+    price: number,
+    images: string[],
+    quantity: number,
+  }
+  
+export interface IUser extends Document {
     _id: Types.ObjectId,
     username: string,
-    passwordHash: string
+    passwordHash: string,
+    cart: ICartItem[]
 }
 
 const userSchema = new Schema<IUser>({
@@ -13,7 +22,14 @@ const userSchema = new Schema<IUser>({
         unique: true,
         minlength: 3
     },
-    passwordHash: String
+    passwordHash: String,
+    cart: [{
+        productId: String,
+        title: String,
+        price: Number,
+        images: [String],
+        quantity: Number
+    }]
 })
 
 userSchema.set('toJSON', {
@@ -27,4 +43,4 @@ userSchema.set('toJSON', {
 
 const User = mongoose.model('User', userSchema)
 
-module.exports = User
+export default User

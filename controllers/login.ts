@@ -1,28 +1,27 @@
-import { Request, Response } from 'express'
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-const loginRouter = require('express').Router()
+import { Request, Response, Router } from 'express'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 import { TokenRequest } from '../types/TokenRequest'
-const middleware = require('../utils/middleware')
-const User = require('../models/user')
+import { userExtractor } from '../utils/middleware'
+import User from '../models/user'
+
+const loginRouter = Router()
 
 loginRouter.post('/', async (req: Request, res: Response) => {
     const { username, password } = req.body
     const user = await User.findOne({ username })
 
     if (!user) {
-        return res.status(401).json({
-            error: 'invalid username'
-        })
+        res.status(401).json({ error: 'invalid username' })
+        return
     }
 
     const passwordCorrect = await bcrypt.compare(password, user.passwordHash)
 
     if (!passwordCorrect) {
-        return res.status(401).json({
-            error: 'invalid password'
-        })
+        res.status(401).json({ error: 'invalid password' })
+        return
     }
 
     const userForToken = {
@@ -30,13 +29,13 @@ loginRouter.post('/', async (req: Request, res: Response) => {
         id: user._id
     }
 
-    const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60 })
+    const token = jwt.sign(userForToken, process.env.SECRET!, { expiresIn: 60*60 })
 
     res.status(200).send({ token, username: user.username })
 })
 
-loginRouter.post('/validate', middleware.userExtractor, (req: TokenRequest, res: Response) => {
+loginRouter.post('/validate', userExtractor, (req: TokenRequest, res: Response) => {
     res.status(200).json({ valid: true, user: req.user })
 })
 
-module.exports = loginRouter
+export default loginRouter
