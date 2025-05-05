@@ -49,7 +49,54 @@ usersRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const savedUser = yield user.save();
     res.status(201).json(savedUser);
 }));
-usersRouter.put('/:id', middleware_1.userExtractor, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+usersRouter.delete('/', middleware_1.userExtractor, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
+    if (!user) {
+        res.status(404).json({ error: 'Unauthorized: user not found' });
+        return;
+    }
+    const deletedUser = yield user_1.default.findByIdAndDelete(user.id.toString());
+    console.log(deletedUser);
+    res.status(204).end();
+}));
+usersRouter.put('/', middleware_1.userExtractor, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const body = req.body;
+    if (!user) {
+        res.status(404).json({ error: 'Unauthorized: user not found' });
+        return;
+    }
+    const cartItem = {
+        productId: body.productId,
+        title: body.title,
+        price: body.price,
+        images: body.images,
+        quantity: body.quantity
+    };
+    const foundItem = user.cart.find(item => item.productId === cartItem.productId);
+    if (foundItem) {
+        if (cartItem.quantity <= 0) {
+            user.cart = user.cart.filter(item => item.productId !== cartItem.productId);
+        }
+        else {
+            foundItem.quantity = cartItem.quantity;
+        }
+    }
+    else {
+        if (cartItem.quantity > 0) {
+            user.cart.push(cartItem);
+        }
+        else {
+            res.status(404).json({ error: 'cannot add quantity 0 into cart' });
+            return;
+        }
+    }
+    const savedUser = yield user.save();
+    const updatedCartItem = savedUser.cart.find(item => item.productId === cartItem.productId);
+    if (!updatedCartItem) {
+        res.status(204).end();
+        return;
+    }
+    res.status(201).json(updatedCartItem);
 }));
 exports.default = usersRouter;

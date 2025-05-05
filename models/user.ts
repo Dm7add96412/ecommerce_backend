@@ -1,6 +1,6 @@
 import mongoose, { AnyObject, Document, Schema, Types } from 'mongoose'
 
-interface ICartItem {
+export interface ICartItem {
     productId: string,
     title: string,
     price: number,
@@ -12,6 +12,12 @@ export interface IUser extends Document {
     _id: Types.ObjectId,
     username: string,
     passwordHash: string,
+    cart: ICartItem[]
+}
+
+export interface IUserResponse extends AnyObject {
+    id: string,
+    username: string,
     cart: ICartItem[]
 }
 
@@ -28,16 +34,18 @@ const userSchema = new Schema<IUser>({
         title: String,
         price: Number,
         images: [String],
-        quantity: Number
+        quantity: Number,
+        _id: false
     }]
 })
 
 userSchema.set('toJSON', {
-    transform: (document: Document, returnedObject: AnyObject) => {
+    transform: (document: Document, returnedObject: Partial<IUserResponse>) => {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id
         delete returnedObject.__v
         delete returnedObject.passwordHash
+
     }
 })
 

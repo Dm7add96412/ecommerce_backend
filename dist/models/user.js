@@ -47,7 +47,8 @@ const userSchema = new mongoose_1.Schema({
             title: String,
             price: Number,
             images: [String],
-            quantity: Number
+            quantity: Number,
+            _id: false
         }]
 });
 userSchema.set('toJSON', {

@@ -13,7 +13,7 @@ loginRouter.post('/', async (req: Request, res: Response) => {
     const user = await User.findOne({ username })
 
     if (!user) {
-        res.status(401).json({ error: 'invalid username' })
+        res.status(401).json({ error: 'user not found' })
         return
     }
 

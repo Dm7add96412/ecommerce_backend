@@ -22,7 +22,7 @@ loginRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const { username, password } = req.body;
     const user = yield user_1.default.findOne({ username });
     if (!user) {
-        res.status(401).json({ error: 'invalid username' });
+        res.status(401).json({ error: 'user not found' });
         return;
     }
     const passwordCorrect = yield bcrypt_1.default.compare(password, user.passwordHash);
