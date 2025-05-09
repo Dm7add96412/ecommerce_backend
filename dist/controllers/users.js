@@ -18,17 +18,23 @@ const user_1 = __importDefault(require("../models/user"));
 const middleware_1 = require("../utils/middleware");
 const usersRouter = (0, express_1.Router)();
 usersRouter.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_1.default.find({});
+    const users = yield user_1.default.find({}).select('username');
     res.json(users);
 }));
-usersRouter.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_1.default.findById(req.params.id);
-    if (user) {
-        res.json(user);
+usersRouter.get('/:id', middleware_1.userExtractor, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const userDb = yield user_1.default.findById(req.params.id);
+    if (user && userDb && ((user === null || user === void 0 ? void 0 : user.id) === (userDb === null || userDb === void 0 ? void 0 : userDb.id))) {
+        res.json(userDb);
     }
     else {
         res.status(404).end();
     }
+    /*   if (userDb) {
+        res.json(userDb)
+      } else {
+        res.status(404).end()
+      } */
 }));
 usersRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;

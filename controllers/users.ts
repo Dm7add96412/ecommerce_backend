@@ -8,17 +8,21 @@ import { userExtractor } from '../utils/middleware'
 const usersRouter = Router()
 
 usersRouter.get('/', async (req: Request, res: Response) => {
-    const users = await User.find({})
+    const users = await User.find({}).select('username')
     res.json(users)
 })
 
-usersRouter.get('/:id', async (req: Request, res: Response) => {
-  const user = await User.findById(req.params.id)
-  if (user) {
-    res.json(user)
+usersRouter.get('/:id', userExtractor ,async (req: TokenRequest, res: Response) => {
+  const user = req.user
+  const userDb = await User.findById(req.params.id)
+
+  if (user && userDb && (user?.id === userDb?.id)) {
+    res.json(userDb)
+    return
   } else {
     res.status(404).end()
   }
+
 })
 
 usersRouter.post('/', async (req: Request, res: Response) => {
