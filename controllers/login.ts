@@ -31,7 +31,7 @@ loginRouter.post('/', async (req: Request, res: Response) => {
 
     const token = jwt.sign(userForToken, process.env.SECRET!, { expiresIn: 60*60 })
 
-    res.status(200).send({ token, username: user.username })
+    res.status(200).send({ token, username: user.username, id: user.id })
 })
 
 loginRouter.post('/validate', userExtractor, (req: TokenRequest, res: Response) => {

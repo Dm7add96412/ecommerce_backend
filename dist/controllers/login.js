@@ -35,7 +35,7 @@ loginRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         id: user._id
     };
     const token = jsonwebtoken_1.default.sign(userForToken, process.env.SECRET, { expiresIn: 60 * 60 });
-    res.status(200).send({ token, username: user.username });
+    res.status(200).send({ token, username: user.username, id: user.id });
 }));
 loginRouter.post('/validate', middleware_1.userExtractor, (req, res) => {
     res.status(200).json({ valid: true, user: req.user });

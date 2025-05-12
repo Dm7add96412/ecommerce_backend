@@ -26,15 +26,11 @@ usersRouter.get('/:id', middleware_1.userExtractor, (req, res) => __awaiter(void
     const userDb = yield user_1.default.findById(req.params.id);
     if (user && userDb && ((user === null || user === void 0 ? void 0 : user.id) === (userDb === null || userDb === void 0 ? void 0 : userDb.id))) {
         res.json(userDb);
+        return;
     }
     else {
         res.status(404).end();
     }
-    /*   if (userDb) {
-        res.json(userDb)
-      } else {
-        res.status(404).end()
-      } */
 }));
 usersRouter.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;
