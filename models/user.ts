@@ -1,7 +1,7 @@
 import mongoose, { AnyObject, Document, Schema, Types } from 'mongoose'
 
 export interface ICartItem {
-    productId: string,
+    id: string,
     title: string,
     price: number,
     images: string[],
@@ -30,7 +30,7 @@ const userSchema = new Schema<IUser>({
     },
     passwordHash: String,
     cart: [{
-        productId: String,
+        id: String,
         title: String,
         price: Number,
         images: [String],

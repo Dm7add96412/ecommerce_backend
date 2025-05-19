@@ -43,7 +43,7 @@ const userSchema = new mongoose_1.Schema({
     },
     passwordHash: String,
     cart: [{
-            productId: String,
+            id: String,
             title: String,
             price: Number,
             images: [String],

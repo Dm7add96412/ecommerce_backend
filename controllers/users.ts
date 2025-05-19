@@ -74,17 +74,17 @@ usersRouter.put('/', userExtractor, async (req: TokenRequest, res: Response) => 
   }
 
   const cartItem: ICartItem = {
-    productId: body.productId,
+    id: body.id,
     title: body.title,
     price: body.price,
     images: body.images,
     quantity: body.quantity
   }
 
-  const foundItem = user.cart.find(item => item.productId === cartItem.productId)
+  const foundItem = user.cart.find(item => item.id === cartItem.id)
   if (foundItem) {
     if (cartItem.quantity <= 0) {
-      user.cart = user.cart.filter(item => item.productId !== cartItem.productId)
+      user.cart = user.cart.filter(item => item.id !== cartItem.id)
     } else {
       foundItem.quantity = cartItem.quantity
     }
@@ -98,7 +98,7 @@ usersRouter.put('/', userExtractor, async (req: TokenRequest, res: Response) => 
     
   }
   const savedUser = await user.save()
-  const updatedCartItem = savedUser.cart.find(item => item.productId === cartItem.productId)
+  const updatedCartItem = savedUser.cart.find(item => item.id === cartItem.id)
   if (!updatedCartItem) {
     res.status(204).end()
     return
