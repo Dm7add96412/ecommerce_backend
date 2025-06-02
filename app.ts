@@ -7,6 +7,7 @@ import usersRouter from './controllers/users'
 import { requestLogger, tokenExtractor, unknownEndpoint, errorHandler } from './utils/middleware'
 import loginRouter from './controllers/login'
 import logger from './utils/logger'
+import path from 'path'
 
 const app = express()
 
@@ -23,7 +24,11 @@ mongoose.connect(mongodbUri)
     })
 
 app.use(cors())
-app.use(express.static('build'))
+
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, 'public')))
+}
+
 app.use(express.json())
 app.use(requestLogger)
 app.use(tokenExtractor)
