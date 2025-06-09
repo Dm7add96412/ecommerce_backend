@@ -23,18 +23,30 @@ mongoose.connect(mongodbUri)
         logger.error('error connecting to MongoDB: ', error.message)
     })
 
-app.use(cors())
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'public')))
-}
+app.use(cors())
 
 app.use(express.json())
 app.use(requestLogger)
 app.use(tokenExtractor)
 
+app.use(express.static(path.join(__dirname, 'public')))
+
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+
+app.get('/{*any}', (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        return next()
+    }
+    if (!req.path.startsWith('/assets') &&
+        !req.path.startsWith('/.well-known')
+    ) {
+        logger.info('Serving SPA for:', req.path)
+    }
+    res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
+
 
 app.use(unknownEndpoint)
 app.use(errorHandler)

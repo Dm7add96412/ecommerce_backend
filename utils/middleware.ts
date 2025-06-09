@@ -6,6 +6,12 @@ import User from '../models/user'
 import { TokenRequest } from '../types/TokenRequest'
 
 const requestLogger = (req: Request, res: Response, next: NextFunction) => {
+  if (
+    req.path.startsWith('/assets') ||
+    req.path.startsWith('/.well-known')
+  ) {
+    return next()
+  }
   logger.info('Method:', req.method)
   logger.info('Path:  ', req.path)
   logger.info('Body:  ', req.body)
