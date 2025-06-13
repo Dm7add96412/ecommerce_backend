@@ -23,7 +23,6 @@ mongoose.connect(mongodbUri)
         logger.error('error connecting to MongoDB: ', error.message)
     })
 
-
 app.use(cors())
 
 app.use(express.json())
@@ -40,13 +39,13 @@ app.get('/{*any}', (req, res, next) => {
         return next()
     }
     if (!req.path.startsWith('/assets') &&
-        !req.path.startsWith('/.well-known')
+        !req.path.startsWith('/.well-known') &&
+        !req.path.startsWith('/vite')
     ) {
         logger.info('Serving SPA for:', req.path)
     }
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
-
 
 app.use(unknownEndpoint)
 app.use(errorHandler)

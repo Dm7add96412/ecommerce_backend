@@ -8,7 +8,8 @@ import { TokenRequest } from '../types/TokenRequest'
 const requestLogger = (req: Request, res: Response, next: NextFunction) => {
   if (
     req.path.startsWith('/assets') ||
-    req.path.startsWith('/.well-known')
+    req.path.startsWith('/.well-known') ||
+    req.path.startsWith('/vite')
   ) {
     return next()
   }
