@@ -7,8 +7,8 @@ Backend handles user data with shopping cart and login functionality.
 
 Deployed app [HERE](https://ecommerceapplication.fly.dev/)
 
-You can test the app with these demo credentials:
-Tester 1
+You can test the app with these demo credentials:<br>
+Tester 1<br>
 password1234
 
 # Requirements
