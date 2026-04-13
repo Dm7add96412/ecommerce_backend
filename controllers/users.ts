@@ -29,11 +29,11 @@ usersRouter.post('/', async (req: Request, res: Response) => {
   const { username, password } = req.body
 
   if (!password) {
-    res.status(400).json({ error: 'password is required' })
+    res.status(400).json({ error: 'Password is required' })
     return
   }
   if (password.length < 3) {
-    res.status(400).json({ error: 'password minimum length 3 letters' })
+    res.status(400).json({ error: 'Password minimum length 3 letters' })
     return
   }
 
@@ -92,7 +92,7 @@ usersRouter.put('/', userExtractor, async (req: TokenRequest, res: Response) => 
     if (cartItem.quantity > 0) {
       user.cart.push(cartItem)
     } else {
-      res.status(404).json({ error: 'cannot add quantity 0 into cart' })
+      res.status(404).json({ error: 'Cannot add quantity 0 into cart' })
       return
     }
     
