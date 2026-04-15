@@ -61,7 +61,6 @@ usersRouter.delete('/', userExtractor, async (req: TokenRequest, res: Response) 
   const deletedUser = await User.findByIdAndDelete(user.id.toString())
   console.log(deletedUser)
   res.status(204).end()
-
 })
 
 usersRouter.put('/', userExtractor, async (req: TokenRequest, res: Response) => {
