@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express'
 import bcrypt from 'bcrypt'
 
-import User, { IUser, IUserResponse, ICartItem } from '../models/user'
+import User, { ICartItem } from '../models/user'
 import { TokenRequest } from '../types/TokenRequest'
 import { userExtractor } from '../utils/middleware'
 

@@ -8,6 +8,7 @@ import { requestLogger, tokenExtractor, unknownEndpoint, errorHandler } from './
 import loginRouter from './controllers/login'
 import logger from './utils/logger'
 import path from 'path'
+import paymentRouter from './controllers/payment'
 
 const app = express()
 
@@ -33,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/payment', paymentRouter)
 
 app.get('/{*any}', (req, res, next) => {
     if (req.path.startsWith('/api/')) {
