@@ -5,9 +5,14 @@ import { Product } from '../types/Product'
 const paymentRouter = Router()
 const stripe = Stripe(process.env.STRIPE_SECRET!)
 
+const BASE_URL = process.env.NODE_ENV === 'dev'
+    ? process.env.DEVELOPMENT_URL
+    : process.env.NODE_ENV === 'prod'
+    ? process.env.PRODUCTION_URL
+    : process.env.DEPLOYMENT_URL
+
 paymentRouter.post('/', async (req: Request, res: Response) => {
     const products: Product[] = req.body.products
-    console.log(products)
 
     const lineItems = products.map((product) => ({
         price_data: {
@@ -25,8 +30,8 @@ paymentRouter.post('/', async (req: Request, res: Response) => {
         payment_method_types: ['card'],
         line_items: lineItems,
         mode: 'payment',
-        success_url: 'http://localhost:5173/success',
-        cancel_url: 'http://localhost:5173/cancel'
+        success_url: `${BASE_URL}/success`,
+        cancel_url: `${BASE_URL}/cancel`
     })
     
     res.json({ url: session.url, id: session.id })
