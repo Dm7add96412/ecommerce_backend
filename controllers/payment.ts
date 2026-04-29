@@ -26,15 +26,44 @@ paymentRouter.post('/', async (req: Request, res: Response) => {
         quantity: product.quantity
     }))
     
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: lineItems,
-        mode: 'payment',
-        success_url: `${BASE_URL}/success`,
-        cancel_url: `${BASE_URL}/cancel`
-    })
-    
-    res.json({ url: session.url, id: session.id })
+    try{
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: lineItems,
+            mode: 'payment',
+            success_url: `${BASE_URL}/success/{CHECKOUT_SESSION_ID}`,
+            cancel_url: `${BASE_URL}/cancel`
+        })
+
+        console.log(session)
+        
+        res.status(200).json({ url: session.url, id: session.id })
+    } catch(err) {
+        console.error(err)
+        res.status(400).json({ error: 'Error proceeding with payment' })
+    }
+
+})
+
+paymentRouter.post('/savepayment', async (req: Request, res: Response) => {
+    const { sessionId } = req.body
+
+    console.log('session ID:', sessionId)
+
+    try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId) 
+        const payment = session.payment_status
+
+        if (payment === 'paid') {
+            res.status(200).json({ message: 'Payment saved successfully' })
+        } else {
+            res.status(400).json({ error: 'Payment was not saved' })
+        }
+
+    } catch(err) {
+        console.error(err)
+        res.status(400).json({ error: 'Could not save payment' })
+    }
 })
 
 export default paymentRouter
