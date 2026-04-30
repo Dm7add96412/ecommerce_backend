@@ -1,6 +1,8 @@
 import { Request, Response, Router } from 'express'
 import Stripe from 'stripe'
-import { Product } from '../types/Product'
+import { userExtractor } from '../utils/middleware'
+import { TokenRequest } from '../types/TokenRequest'
+import { ICartItem } from '../models/user'
 
 const paymentRouter = Router()
 const stripe = Stripe(process.env.STRIPE_SECRET!)
@@ -11,10 +13,15 @@ const BASE_URL = process.env.NODE_ENV === 'dev'
     ? process.env.PRODUCTION_URL
     : process.env.DEPLOYMENT_URL
 
-paymentRouter.post('/', async (req: Request, res: Response) => {
-    const products: Product[] = req.body.products
+paymentRouter.post('/', userExtractor, async (req: TokenRequest, res: Response) => {
+    if(!req.body) {
+        res.status(400).json({ error: 'Cart is required' })
+        return
+    }
 
-    const lineItems = products.map((product) => ({
+    const cart: ICartItem[] = req.body
+
+    const lineItems = cart.map((product) => ({
         price_data: {
             currency: 'EUR',
             product_data: {
@@ -34,27 +41,33 @@ paymentRouter.post('/', async (req: Request, res: Response) => {
             success_url: `${BASE_URL}/success/{CHECKOUT_SESSION_ID}`,
             cancel_url: `${BASE_URL}/cancel`
         })
-
-        console.log(session)
         
         res.status(200).json({ url: session.url, id: session.id })
     } catch(err) {
         console.error(err)
         res.status(400).json({ error: 'Error proceeding with payment' })
     }
-
 })
 
-paymentRouter.post('/savepayment', async (req: Request, res: Response) => {
-    const { sessionId } = req.body
+paymentRouter.post('/savepayment', userExtractor, async (req: TokenRequest, res: Response) => {    
+    const sessionId = req.body.sessionId as string
+    const user = req.user
 
-    console.log('session ID:', sessionId)
+    if(!sessionId) {
+        res.status(400).json({ error: 'Session ID is required' })
+        return
+    }
 
+    if (!sessionId) {
+        res.status(400).json({ error: 'Password is required' })
+        return
+    }
     try {
         const session = await stripe.checkout.sessions.retrieve(sessionId) 
         const payment = session.payment_status
 
         if (payment === 'paid') {
+
             res.status(200).json({ message: 'Payment saved successfully' })
         } else {
             res.status(400).json({ error: 'Payment was not saved' })
