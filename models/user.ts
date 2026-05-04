@@ -7,18 +7,34 @@ export interface ICartItem {
     images: string[],
     quantity: number,
   }
+
+export interface IOrderHistoryItem {
+    title: string,
+    price: number,
+    quantity: number
+}
   
 export interface IUser extends Document {
     _id: Types.ObjectId,
     username: string,
     passwordHash: string,
-    cart: ICartItem[]
+    cart: ICartItem[],
+    orderHistory: [
+        cart: IOrderHistoryItem[],
+        id: string,
+        date: string
+    ]
 }
 
 export interface IUserResponse extends AnyObject {
     id: string,
     username: string,
-    cart: ICartItem[]
+    cart: ICartItem[],
+    orderHistory: [
+        cart: IOrderHistoryItem[],
+        id: string,
+        date: string
+    ]
 }
 
 const userSchema = new Schema<IUser>({
@@ -36,6 +52,17 @@ const userSchema = new Schema<IUser>({
         images: [String],
         quantity: Number,
         _id: false
+    }],
+    orderHistory: [{
+        cart: [{
+            title: String,
+            price: Number,
+            quantity: Number,
+            date: String,
+            _id: false
+        }],
+        id: String,
+        date: String
     }]
 })
 
@@ -45,7 +72,6 @@ userSchema.set('toJSON', {
         delete returnedObject._id
         delete returnedObject.__v
         delete returnedObject.passwordHash
-
     }
 })
 

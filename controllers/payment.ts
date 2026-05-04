@@ -67,6 +67,19 @@ paymentRouter.post('/savepayment', userExtractor, async (req: TokenRequest, res:
         const payment = session.payment_status
 
         if (payment === 'paid') {
+            const cart = user?.cart
+            const line_items = await stripe.checkout.sessions.listLineItems(sessionId)
+            
+            const orderHistory = line_items.data.map(item => ({
+                title: item.description,
+                price: Number(item.price?.unit_amount) / 100,
+                quantity: item.quantity
+            })
+            )
+
+            const orderDate = new Date().toLocaleString()
+
+            console.log(orderHistory)
 
             res.status(200).json({ message: 'Payment saved successfully' })
         } else {
