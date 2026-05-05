@@ -8,10 +8,16 @@ export interface ICartItem {
     quantity: number,
   }
 
-export interface IOrderHistoryItem {
+export interface IOrderHistoryCartItem {
     title: string,
     price: number,
     quantity: number
+}
+
+export interface IOrderHistoryItem {
+    cart: IOrderHistoryCartItem[],
+    id: string,
+    date: string
 }
   
 export interface IUser extends Document {
@@ -19,22 +25,14 @@ export interface IUser extends Document {
     username: string,
     passwordHash: string,
     cart: ICartItem[],
-    orderHistory: [
-        cart: IOrderHistoryItem[],
-        id: string,
-        date: string
-    ]
+    orderHistory: IOrderHistoryItem[]
 }
 
 export interface IUserResponse extends AnyObject {
     id: string,
     username: string,
     cart: ICartItem[],
-    orderHistory: [
-        cart: IOrderHistoryItem[],
-        id: string,
-        date: string
-    ]
+    orderHistory: IOrderHistoryItem[]
 }
 
 const userSchema = new Schema<IUser>({
@@ -58,11 +56,11 @@ const userSchema = new Schema<IUser>({
             title: String,
             price: Number,
             quantity: Number,
-            date: String,
             _id: false
         }],
         id: String,
-        date: String
+        date: String,
+        _id: false
     }]
 })
 

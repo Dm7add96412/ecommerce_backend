@@ -2,7 +2,7 @@ import { Request, Response, Router } from 'express'
 import Stripe from 'stripe'
 import { userExtractor } from '../utils/middleware'
 import { TokenRequest } from '../types/TokenRequest'
-import { ICartItem } from '../models/user'
+import { ICartItem, IOrderHistoryItem } from '../models/user'
 
 const paymentRouter = Router()
 const stripe = Stripe(process.env.STRIPE_SECRET!)
@@ -58,8 +58,8 @@ paymentRouter.post('/savepayment', userExtractor, async (req: TokenRequest, res:
         return
     }
 
-    if (!sessionId) {
-        res.status(400).json({ error: 'Password is required' })
+    if (!user) {
+        res.status(400).json({ error: 'User was not found in database' })
         return
     }
     try {
@@ -67,19 +67,30 @@ paymentRouter.post('/savepayment', userExtractor, async (req: TokenRequest, res:
         const payment = session.payment_status
 
         if (payment === 'paid') {
-            const cart = user?.cart
+            user.cart = []
+            const foundOrder = user.orderHistory.find(item => item.id === sessionId)
+            if (foundOrder) {
+                res.status(400).json({ error: 'Payment already found in order history' })
+                return
+            }
             const line_items = await stripe.checkout.sessions.listLineItems(sessionId)
             
-            const orderHistory = line_items.data.map(item => ({
-                title: item.description,
-                price: Number(item.price?.unit_amount) / 100,
-                quantity: item.quantity
+            const orderHistoryCart = line_items.data.map(item => ({
+                title: item.description || '',
+                price: Number(item.price?.unit_amount) / 100 || 0,
+                quantity: item.quantity || 0
             })
             )
-
             const orderDate = new Date().toLocaleString()
 
-            console.log(orderHistory)
+            const orderItem: IOrderHistoryItem = {
+                id: sessionId,
+                date: orderDate,
+                cart: orderHistoryCart
+            }
+
+            user.orderHistory.push(orderItem)
+            user.save()
 
             res.status(200).json({ message: 'Payment saved successfully' })
         } else {
