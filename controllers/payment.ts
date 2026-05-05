@@ -7,11 +7,11 @@ import { ICartItem, IOrderHistoryItem } from '../models/user'
 const paymentRouter = Router()
 const stripe = Stripe(process.env.STRIPE_SECRET!)
 
-const BASE_URL = process.env.NODE_ENV === 'dev'
+const BASE_URL = /* process.env.NODE_ENV === 'dev'
     ? process.env.DEVELOPMENT_URL
     : process.env.NODE_ENV === 'prod'
     ? process.env.PRODUCTION_URL
-    : process.env.DEPLOYMENT_URL
+    : */ process.env.DEPLOYMENT_URL
 
 paymentRouter.post('/', userExtractor, async (req: TokenRequest, res: Response) => {
     if(!req.body) {
