@@ -89,7 +89,7 @@ paymentRouter.post('/savepayment', userExtractor, async (req: TokenRequest, res:
                 cart: orderHistoryCart
             }
 
-            user.orderHistory.push(orderItem)
+            user.orderHistory.unshift(orderItem)
             user.save()
 
             res.status(200).json({ message: 'Payment saved successfully' })
