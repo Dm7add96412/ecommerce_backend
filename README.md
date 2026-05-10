@@ -3,9 +3,11 @@
 A Node.js/Express/Typescript backend for a fake e-commerce shopping app.
 MongoDB, JWT and Restful API. Stripe mock payment.
 
-Backend handles user data with shopping cart, order, Stripe payment and login functionality.
+Backend handles user data with shopping cart, order history, Stripe payment and login functionality.
 
 Deployed app [HERE](https://ecommerceapplication.fly.dev/)
+
+You can sign up, login, shop and do a mock payment with Stripe, using their [test cards](https://docs.stripe.com/testing?testing-method=card-numbers#visa)
 
 # Requirements
 
